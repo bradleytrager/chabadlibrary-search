@@ -27,7 +27,7 @@ var SearchApp = angular.module('SearchApp', [])
 			var queryTerms = $scope.query.split(" ");
 
 			queryTerms.forEach(function(term) {
-				content = content.replace(new RegExp("\\s" + term + "\\s", "g"),' <b>' + term + '</b> ');
+				content = content.replace(new RegExp(term, "g"),' <b>' + term + '</b> ');
 			});
 
 			return content;
