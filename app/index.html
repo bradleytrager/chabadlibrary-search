@@ -6,10 +6,11 @@
 <body dir="rtl" ng-app="SearchApp">
 
 <div ng-controller="SearchController">
+	<input ng-model="query" /> <button ng-click="search(query)">Search</button>
 	<div ng-repeat="doc in data">
 		<div ng-bind="doc._source.title"></div>
 		<div 
-		ng-bind-html="$sce.trustAsHtml(doc._source.content.replace(searchTerm,'<b>' + searchTerm + '</b>'))"></div>
+		ng-bind-html="$sce.trustAsHtml(doc._source.content)"></div>
 	</div>
 </div>
 
