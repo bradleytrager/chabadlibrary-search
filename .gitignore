@@ -186,3 +186,6 @@ logs/
 tmp/
 project/
 esbackups/
+
+data/
+node_modules
