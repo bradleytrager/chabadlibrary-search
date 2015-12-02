@@ -4,19 +4,31 @@ var cheerio = require('cheerio');
 var repl = require("repl");
 var request = require('request');
 var RateLimiter = require('limiter').RateLimiter;
-var limiter = new RateLimiter(1, 100);
+var requestLimiter = new RateLimiter(5, 100);
 
 var files;
+var readFileNumber = 0;
+var indexFileNumber = 0;
 recursive('../data/chabadlibrary.org/books', function(err, files) {
-	// Files is an array of filename 
-	// console.log(files.length);
-	files.forEach(readAndIndex)
-		// readAndIndex(files[0]);
+	indexFiles(files);
 });
 
+function indexFiles(files) {
+	console.log('files.length', files.length);
+	if (files.length > 0) {
+		console.log('numFiles', files.length);
+		readAndIndex(files[0], function() {
+			files.shift();
+			indexFiles(files);
+		});
+	}
+}
 
-function readAndIndex(file) {
+
+function readAndIndex(file, callback) {
 	fs.readFile(file, 'utf8', function(err, data) {
+		console.log('Read file: ', readFileNumber);
+		readFileNumber++;
 		if (err) {
 			return console.log(err);
 		}
@@ -32,13 +44,14 @@ function readAndIndex(file) {
 				return !!el;
 			})
 			.join('</p><p>') + '</p>';
-		console.log(title);
-		if (title && content != '<p></p>'){
+		if (title && content != '<p></p>') {
 
 			// Throttle requests
-			limiter.removeTokens(1, function(err, remainingRequests) {
+			requestLimiter.removeTokens(1, function(err, remainingRequests) {
 				// err will only be set if we request more than the maximum number of
 				// requests we set in the constructor
+				console.log('Indexing file #', indexFileNumber, title);
+				indexFileNumber++;
 
 				// remainingRequests tells us how many additional requests could be sent
 				// right this moment
@@ -48,13 +61,15 @@ function readAndIndex(file) {
 				});
 			});
 
+
 		}
+		callback();
 
 	});
 }
 
 
-function postDocument(data) {
+function postDocument(data, callback) {
 	request.post({
 		"har": {
 			"method": "POST",
@@ -71,6 +86,9 @@ function postDocument(data) {
 	}, function(error) {
 		if (error) {
 			console.log(arguments);
+		}
+		if (callback) {
+			callback();
 		}
 	});
 }
