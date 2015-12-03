@@ -8,6 +8,9 @@ var SearchApp = angular.module('SearchApp', [])
 		$scope.$sce = $sce;
 		$scope.searchTerm = 'הנשמה';
 		$scope.search = function(query) {
+			$scope.query = query;
+			addSearchHistory(query);
+			
 			$http.get('http://localhost:9200/_search?q=' + query).then(function(res) {
 				$scope.data = res.data.hits.hits.map(function(doc) {
 					return {
@@ -23,6 +26,15 @@ var SearchApp = angular.module('SearchApp', [])
 
 			});
 		};
+
+		$scope.searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+		function addSearchHistory(term) {
+			if ($scope.searchHistory.indexOf(term) === -1) {
+				$scope.searchHistory.push(term);
+				localStorage.setItem("searchHistory", JSON.stringify($scope.searchHistory));
+			}
+		}
 
 		function render(content) {
 			var queryTerms = $scope.query.split(" ");

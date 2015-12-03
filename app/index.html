@@ -10,7 +10,14 @@
 <body dir="rtl" ng-app="SearchApp">
     <div class="container" ng-controller="SearchController">
     <div class="row" style="margin:50px 0;">
-    	<div class="col-md-push-3 col-md-6">
+        <div class="col-md-3">
+            <ul>
+                <li ng-repeat="term in searchHistory">
+                    <a ng-bind="term" ng-click="search(term)"></a>
+                </li>
+            </ul>
+        </div>
+    	<div class="col-md-6">
     		<form ng-submit="search(query)">
     		    <input ng-model="query" type="search" class="form-control" placeholder="Search"/>
     		    <!-- <button ng-click="search(query)" class="btn">Search</button> -->
