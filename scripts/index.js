@@ -4,12 +4,13 @@ var cheerio = require('cheerio');
 var repl = require("repl");
 var request = require('request');
 var RateLimiter = require('limiter').RateLimiter;
-var requestLimiter = new RateLimiter(5, 100);
+var requestLimiter = new RateLimiter(4, 100);
 
 var files;
 var readFileNumber = 0;
 var indexFileNumber = 0;
 recursive('../data/chabadlibrary.org/books', function(err, files) {
+	// process.exit();
 	indexFiles(files);
 });
 
@@ -23,7 +24,6 @@ function indexFiles(files) {
 		});
 	}
 }
-
 
 function readAndIndex(file, callback) {
 	fs.readFile(file, 'utf8', function(err, data) {
@@ -45,7 +45,12 @@ function readAndIndex(file, callback) {
 			})
 			.join('</p><p>') + '</p>';
 		if (title && content != '<p></p>') {
-
+			var link;
+			var regex = /(http:\/\/.+)"/;
+			var result = regex.exec($('script').text());
+			if (result.length > 1) {
+				link = result[1];
+			}
 			// Throttle requests
 			requestLimiter.removeTokens(1, function(err, remainingRequests) {
 				// err will only be set if we request more than the maximum number of
@@ -55,19 +60,18 @@ function readAndIndex(file, callback) {
 
 				// remainingRequests tells us how many additional requests could be sent
 				// right this moment
-				postDocument({
+				var doc = {
 					title: title,
+					link: link,
 					content: content
-				});
+				};
+				// console.log(doc);
+				postDocument(doc);
 			});
-
-
 		}
 		callback();
-
 	});
 }
-
 
 function postDocument(data, callback) {
 	request.post({
@@ -92,13 +96,3 @@ function postDocument(data, callback) {
 		}
 	});
 }
-
-// Allow 150 requests per hour (the Twitter search limit). Also understands
-// 'second', 'minute', 'day', or a number of milliseconds
-
-
-// var local = repl.start("node::local> ");
-
-// Exposing the function "mood" to the local REPL's context.
-// local.context.$ = $;
-//=> <h2 class="title welcome">Hello there!</h2>

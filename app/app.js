@@ -13,6 +13,7 @@ var SearchApp = angular.module('SearchApp', [])
 					return {
 						_source: {
 							title: doc._source.title,
+							link: doc._source.link,
 							content: render(doc._source.content)
 						}
 					};

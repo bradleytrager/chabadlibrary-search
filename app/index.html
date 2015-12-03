@@ -1,21 +1,39 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<title></title>
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
 </head>
+
 <body dir="rtl" ng-app="SearchApp">
-
-<div ng-controller="SearchController">
-	<input ng-model="query" /> <button ng-click="search(query)">Search</button>
-	<div ng-repeat="doc in data">
-		<div ng-bind="doc._source.title"></div>
-		<div 
-		ng-bind-html="$sce.trustAsHtml(doc._source.content)"></div>
-	</div>
-</div>
-
+    <div class="container" ng-controller="SearchController">
+    <div class="row" style="margin:50px 0;">
+    	<div class="col-md-push-3 col-md-6">
+    		<form ng-submit="search(query)">
+    		    <input ng-model="query" type="search" class="form-control" placeholder="Search"/>
+    		    <!-- <button ng-click="search(query)" class="btn">Search</button> -->
+    		</form>
+    	</div>
+    </div>
+    	<div class="row">
+    	    <div class="col-md-12">
+    	        <div >
+    	            
+    	            <div ng-repeat="doc in data">
+    	                <div>
+    	                    <a ng-href="{{doc._source.link}}" ng-bind="doc._source.title" target="_blank"></a>
+    	                </div>
+    	                <div ng-bind-html="$sce.trustAsHtml(doc._source.content)"></div>
+    	            </div>
+    	        </div>
+    	    </div>
+    	</div>
+    </div>
 </body>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-mocks/angular-mocks.js"></script>
 <script src="app.js"></script>
+
 </html>
